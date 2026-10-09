@@ -1,5 +1,16 @@
 // Centralized API Client for KrishiMitra Backend
-const API_BASE = 'http://localhost:8080/api';
+export function getApiBaseUrl() {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, '');
+  }
+  const customUrl = localStorage.getItem('km_api_url');
+  if (customUrl) {
+    return customUrl.replace(/\/+$/, '');
+  }
+  // When accessed via Mobile on same Wi-Fi (e.g. 192.168.x.x:5500), use the host's IP
+  const hostname = typeof window !== 'undefined' && window.location.hostname ? window.location.hostname : 'localhost';
+  return `http://${hostname}:8080/api`;
+}
 
 export function getToken() {
   return localStorage.getItem('km_token');
@@ -31,7 +42,8 @@ export async function request(endpoint, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
+  const baseUrl = getApiBaseUrl();
+  const response = await fetch(`${baseUrl}${endpoint}`, {
     ...options,
     headers
   });
