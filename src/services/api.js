@@ -7,9 +7,14 @@ export function getApiBaseUrl() {
   if (customUrl) {
     return customUrl.replace(/\/+$/, '');
   }
-  // When accessed via Mobile on same Wi-Fi (e.g. 192.168.x.x:5500), use the host's IP
-  const hostname = typeof window !== 'undefined' && window.location.hostname ? window.location.hostname : 'localhost';
-  return `http://${hostname}:8080/api`;
+  if (typeof window !== 'undefined' && window.location.hostname) {
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.') || host.startsWith('10.')) {
+      return `http://${host}:8080/api`;
+    }
+  }
+  // Production default for Vercel / deployed apps
+  return 'https://ai-crop-backend-1.onrender.com/api';
 }
 
 export function getToken() {
