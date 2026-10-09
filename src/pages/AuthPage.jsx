@@ -48,7 +48,13 @@ export function AuthPage() {
     e.preventDefault();
     if (!registerForm.username || !registerForm.password || !registerForm.fullName) return;
     setLoading(true);
-    const res = await register(registerForm);
+    const payload = {
+      ...registerForm,
+      email: registerForm.email && registerForm.email.trim().length > 0
+        ? registerForm.email.trim()
+        : `${registerForm.username.toLowerCase().replace(/[^a-z0-9]/g, '')}@farmer.krishimitra.in`
+    };
+    const res = await register(payload);
     setLoading(false);
     if (res.success) {
       navigate('/dashboard');
